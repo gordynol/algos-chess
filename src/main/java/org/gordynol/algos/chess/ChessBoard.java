@@ -1,36 +1,48 @@
 package org.gordynol.algos.chess;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Stream;
 
 import static org.gordynol.algos.chess.BoardPlacement.emptyBoardPlacement;
 
 public class ChessBoard {
-    final int m;
-    final int n;
-
+    private final int m;
+    private final int n;
     private final BoardPlacement placement;
+    private final Map<Figure, Map<BoardPosition, BoardPlacement>> placementMap;
 
     public ChessBoard(int m, int n) {
         this.m = m;
         this.n = n;
 
         placement = emptyBoardPlacement(m, n);
+        placementMap = new HashMap<>();
+        for (Figure figure : Figure.values()) {
+            Map<BoardPosition, BoardPlacement> figurePlacementMap = new HashMap<>();
+            positionsStream().forEach(position ->
+                    figurePlacementMap.put(position, BoardPlacement.boardWithSingleFigure(m, n, position, figure)));
+
+            placementMap.put(figure, figurePlacementMap);
+        }
     }
 
-    ChessBoard(int m, int n, BoardPlacement placement) {
+    private ChessBoard(int m, int n, Map<Figure, Map<BoardPosition, BoardPlacement>> placementMap, BoardPlacement placement) {
         this.m = m;
         this.n = n;
+        this.placementMap = placementMap;
         this.placement = placement;
     }
 
-    public Stream<BoardPosition> positionsForFigure(Figure figure) {
+    public Stream<BoardPlacement> placementsForFigure(Figure figure) {
         return positionsStream()
-                .filter(p -> canPutFigure(p, figure));
+                .filter(p -> placement.isOrderedFigurePlacement(figure, p))
+                .map(p -> placementMap.get(figure).get(p))
+                .filter(p -> canPutFigure(p));
     }
 
-    private boolean canPutFigure(BoardPosition p, Figure figure) {
-        BoardPlacement figurePlacement = BoardPlacement.boardWithSingleFigure(m, n, p, figure);
-        return placement.isOrderedFigurePlacement(figure, p) && !placement.overlaps(figurePlacement);
+    private boolean canPutFigure(BoardPlacement figurePlacement) {
+        return !placement.overlaps(figurePlacement);
     }
 
     private Stream<BoardPosition> positionsStream() {
@@ -39,8 +51,7 @@ public class ChessBoard {
                 .limit(m * n);
     }
 
-    public ChessBoard addFigure(Figure figure, BoardPosition position) {
-        BoardPlacement figurePlacement = BoardPlacement.boardWithSingleFigure(m, n, position, figure);
-        return new ChessBoard(m, n, placement.add(figurePlacement));
+    public ChessBoard add(BoardPlacement figurePlacement) {
+        return new ChessBoard(m, n, placementMap, placement.add(figurePlacement));
     }
 }
