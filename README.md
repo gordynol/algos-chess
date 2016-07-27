@@ -8,3 +8,6 @@ Write a program which takes as input:
 - The number of pieces of each type (King, Queen, Bishop, Rook and Knight) to try and place on the board.
 
 As output, the program should list count of all the unique configurations for which all of the pieces can be placed on the board without threatening each other.
+
+To test, run: mvn test
+To run performance benchmark, run: mvn test -Pperf
