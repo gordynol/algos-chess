@@ -41,8 +41,4 @@ public class BoardPosition {
                 .append(y)
                 .toHashCode();
     }
-
-    public BoardRelation relativeTo(BoardPosition that) {
-        return new BoardRelation(x - that.getX(), y - that.getY());
-    }
 }

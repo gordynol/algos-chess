@@ -4,13 +4,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import static org.gordynol.algos.chess.BoardPlacement.emptyBoardPlacement;
+import static org.gordynol.algos.chess.BoardState.emptyBoardPlacement;
 
 public class ChessBoard {
     private final int m;
     private final int n;
-    private final BoardPlacement placement;
-    private final Map<Figure, Map<BoardPosition, BoardPlacement>> placementMap;
+    private final BoardState placement;
+    private final Map<Figure, Map<BoardPosition, BoardState>> placementMap;
 
     public ChessBoard(int m, int n) {
         this.m = m;
@@ -19,29 +19,29 @@ public class ChessBoard {
         placement = emptyBoardPlacement(m, n);
         placementMap = new HashMap<>();
         for (Figure figure : Figure.values()) {
-            Map<BoardPosition, BoardPlacement> figurePlacementMap = new HashMap<>();
+            Map<BoardPosition, BoardState> figurePlacementMap = new HashMap<>();
             positionsStream().forEach(position ->
-                    figurePlacementMap.put(position, BoardPlacement.boardWithSingleFigure(m, n, position, figure)));
+                    figurePlacementMap.put(position, BoardState.boardWithSingleFigure(m, n, position, figure)));
 
             placementMap.put(figure, figurePlacementMap);
         }
     }
 
-    private ChessBoard(int m, int n, Map<Figure, Map<BoardPosition, BoardPlacement>> placementMap, BoardPlacement placement) {
+    private ChessBoard(int m, int n, Map<Figure, Map<BoardPosition, BoardState>> placementMap, BoardState placement) {
         this.m = m;
         this.n = n;
         this.placementMap = placementMap;
         this.placement = placement;
     }
 
-    public Stream<BoardPlacement> placementsForFigure(Figure figure) {
+    public Stream<BoardState> placementsForFigure(Figure figure) {
         return positionsStream()
                 .filter(p -> placement.isOrderedFigurePlacement(figure, p))
                 .map(p -> placementMap.get(figure).get(p))
-                .filter(p -> canPutFigure(p));
+                .filter(this::canPutFigure);
     }
 
-    private boolean canPutFigure(BoardPlacement figurePlacement) {
+    private boolean canPutFigure(BoardState figurePlacement) {
         return !placement.overlaps(figurePlacement);
     }
 
@@ -51,7 +51,7 @@ public class ChessBoard {
                 .limit(m * n);
     }
 
-    public ChessBoard add(BoardPlacement figurePlacement) {
+    public ChessBoard add(BoardState figurePlacement) {
         return new ChessBoard(m, n, placementMap, placement.add(figurePlacement));
     }
 }
