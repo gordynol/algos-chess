@@ -19,8 +19,7 @@ public class ChessPlacementProblemSolverMicroBenchmark {
                 .include(this.getClass().getName() + ".*")
                 .shouldFailOnError(true)
                 .shouldDoGC(true)
-                //.jvmArgs("-XX:+UnlockDiagnosticVMOptions", "-XX:+PrintInlining")
-                //.addProfiler(WinPerfAsmProfiler.class)
+                .jvmArgs("-Xmx256m")
                 .build();
 
         new Runner(opt).run();
