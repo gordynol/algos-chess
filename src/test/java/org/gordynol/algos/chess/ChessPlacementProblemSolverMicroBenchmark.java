@@ -41,7 +41,7 @@ public class ChessPlacementProblemSolverMicroBenchmark {
         double threshold = 0.5;
 
         assertions.assertThat(basic1KOperations.getStandardDeviation() / basic1KOperations.getMean())
-                .describedAs("Benchmark is precise enough").isLessThan(0.1);
+                .describedAs("Benchmark is precise enough").isLessThan(0.3);
 
         assertions.assertThat(chessS24F1.getMean() / basic1KOperations.getMean())
                 .as("Board 24 squares, 1 figure. Should take no more than 24 1K operations").isLessThan(24 / threshold);
